@@ -1,23 +1,15 @@
-# 初探 NotebookLM + Google 表單：以 醫療機構電子病歷製作及管理辦法 為例
-
-## 一. 前言
-
-延續前一篇: <a href="https://www.jasperstudy.com/2025/02/notebooklm.html" target="_blank">初探 NotebookLM：以 醫療機構電子病歷製作及管理辦法 為例</a> 有提到 NotebookLM 可以產生題庫, 但後續需 自行於 Google Forms 或 Microsoft Forms 建立表單測驗卷.  
-
-這個建立表單測驗卷的工作, 有沒有辦法由 AI 協助建立; 而不需手工一題一題複製貼上呢? 答案是可行的.  
-
-本文將以 Google Forms 為例, 透過 ChatGPT o3 推理模型, 產生 Google Apps Script, 將產出貼到 Google Apps Script 的執行環境, 操作 Google 表單/文件 ... 等物件, 建置測驗卷; 並要求在學生 [提交] 之後, 可以自動批改, 將成續寫到試算表, 同時, 將成續一併以 email 寄給學生.   
-
-依前一篇的內容, 產生題庫以後 即可進行以下步驟.
-
-<!-- more -->
-
-## 二. 以 ChatGPT o3 推理模型 產生所需的 Google Apps Script
-
-### STEP 1: 提示
-
-```plaintext
-# 需求
+﻿<body>
+    <div style="font-size: medium;">
+        <!-- <h1 id="初探-notebooklm--google-表單以-醫療機構電子病歷製作及管理辦法-為例">初探 NotebookLM + Google 表單：以 醫療機構電子病歷製作及管理辦法 為例</h1> -->
+        <h2 id="一-前言">一. 前言</h2>
+        <p>延續前一篇: <a href="https://www.jasperstudy.com/2025/02/notebooklm.html" target="_blank">初探 NotebookLM：以 醫療機構電子病歷製作及管理辦法 為例</a> 有提到 NotebookLM 可以產生題庫, 但後續需 自行於 Google Forms 或 Microsoft Forms 建立表單測驗卷.</p>
+        <p>這個建立表單測驗卷的工作, 有沒有辦法由 AI 協助建立; 而不需手工一題一題複製貼上呢? 答案是可行的.</p>
+        <p>本文將以 Google Forms 為例, 透過 ChatGPT o3 推理模型, 產生 Google Apps Script, 將產出貼到 Google Apps Script 的執行環境, 操作 Google 表單/文件 ... 等物件, 建置測驗卷; 並要求在學生 [提交] 之後, 可以自動批改, 將成續寫到試算表, 同時, 將成續一併以 email 寄給學生.</p>
+        <p>依前一篇的內容, 產生題庫以後 即可進行以下步驟.</p>
+        <!-- more -->
+        <h2 id="二-以-chatgpt-o3-推理模型-產生所需的-google-apps-script">二. 以 ChatGPT o3 推理模型 產生所需的 Google Apps Script</h2>
+        <h3 id="step-1-提示">STEP 1: 提示</h3>
+        <pre><code class="language-plaintext"># 需求
 
 請幫我用 Google App Script :
 
@@ -31,22 +23,22 @@
 ## 考生提交考卷後的需求
 
 1. 依答案批改考卷, 計算成績.  
-2. 寫入至 "三年A班-電子病歷測驗成績" 試算表. 欄位說明如下:
+2. 寫入至 &quot;三年A班-電子病歷測驗成績&quot; 試算表. 欄位說明如下:
   - 時間戳記
   - 姓名
   - email
   - 成績
   - 各題的回答, 假設有 10 題, 那就設置 Q1 .. Q10 共 10 個欄位 
     - 各欄位只需填入英文字母的答案.
-      - 例如: 考生在第1題回答 B, 則試算表的 Q1 欄位, 只要填入 "B", 不需填入 "B. 醫療法第六十九條"
-    - 如果有答錯, 該儲存格以黃底標示.	
+      - 例如: 考生在第1題回答 B, 則試算表的 Q1 欄位, 只要填入 &quot;B&quot;, 不需填入 &quot;B. 醫療法第六十九條&quot;
+    - 如果有答錯, 該儲存格以黃底標示. 
 1. 以 email 回覆學生實得分數. 
 
 # 電子病歷測驗卷的考題及答案.
 
 ## 考題
 
-<<< 
+&lt;&lt;&lt; 
 
 1. 醫療機構電子病歷製作及管理辦法是依據下列哪一條法規訂定？
   A. 醫療法第六十八條
@@ -117,12 +109,12 @@
   C. 得免以書面方式保存，且不受本法第七十條第一項保存期間之限制
   D. 應於一年內銷毀
   
->>>
+&gt;&gt;&gt;
 
 
 ## 答案
 
-<<<
+&lt;&lt;&lt;
 
 1. 答案：B
 解說：本辦法係依醫療法第六十九條規定訂定。
@@ -154,94 +146,73 @@
 1. 答案：C
 解說：將既有紙本病歷轉錄為電子檔案並簽章封存後，原件得免以書面方式保存，且不受醫療法第七十條第一項保存期間之限制。
 
->>>
-```
-
-### STEP 2: Script
-
-完整的 script, 參考 [附錄一].  
-
-### STEP 3:  在 Google Apps Script 執行環境, 建立表單相關物件及事件
-
-1. 開啟 Google Apps Script 網頁: <a href="https://script.google.com/home" target="_blank">Google Apps Script</a>. 
-2. 建立新專案. 名稱: "三年A班-電子病歷測驗".  
-3. 將產生的 javascript, 貼到 Script Editor.  
-4. 將專案 [儲存] 至雲端硬碟, 再按 [執行].
-
-![01-儲存及執行 Google Apps Script](pictures/01-儲存及執行%20Google%20Apps%20Script.png)  
-
-1. 第一次執行會要求授權, 按畫面指示完成. 如遇「未經 Google 驗證」警告, 點「進階」→「前往…」即可.  
-
-![02 要求授權](pictures/02-要求授權.png)  
-
-![03 要求授權](pictures/03-要求授權.png)  
-
-![04 要求授權](pictures/04-要求授權.png)  
-
-1. 建立表單過程, 發現有錯誤.  
---> 說真的, 不太可能一次就建立成功.  
-![05 建立過程發生錯誤](pictures/05-建立過程發生錯誤.png)
-
-1. 將錯誤貼到 ChatGPT, 請它修正.  
---> 應該會有多次.  
-
-### STEP 4: 第一版可以建立表單相關物件及事件的 script
-
-完整的 script, 參考 [附錄二].  
-
-## 三. 開始測試. 如果有錯, 要回頭調整 Script
-
-### STEP 1: 填寫考題, 並 [提交]
-
-![21 填寫考題](pictures/21-填寫考題.png)  
-
-![22 提交考卷](pictures/22-提交考卷.png)  
-
-### STEP 2: 沒有將成績寫入試算表, 也未寄送成績單
-
-請 ChatGPT 再修正程式.  
-因為過程有點多, 這個部分就不贅述.  
-
-### STEP 3: 終於產出可滿足需求的版本 script
-
-完整的 script, 參考 [附錄三].  
-
-### STEP 4: 測試截圖 (考生)
-
-1. 填寫測驗卷, 按 [提交].  
- 
-![21 填寫考題](pictures/21-填寫考題.png)  
-
-![22 提交考卷](pictures/22-提交考卷.png)  
-
-1. 在 email 會收到成績通知.  
-
-![23 收到成績單](pictures/23-收到成績單.png)  
-
-### STEP 5: 測試截圖 (老師)
-
-1. 查看各考生的成續
-
-![31 老師查看成績](pictures/31-老師查看成績.png)  
-
-## 四. 相關的程式, 表單, 檔案的存放位置
-
-相關的程式, 表單, 檔案 預設都存在 "老師" (測試卷製作者) Google 雲端硬碟的根目錄.  
-
-![41 相關程式_表單_檔案_存放位置](pictures/41-相關程式_表單_檔案_存放位置.png)  
-
-## 五. 結論
-
-### 建立 script 範本的好處
-
-經由反覆與 ChatGPT 對話, 終於產出一版可用的測驗卷 script 範本.  
-
-這樣作有什麼好處呢? 未來只要有新的測驗卷要作:  
-1. 準備 考題及答案.  
-2. 準備 QUESTIONS 的樣版.  
-
-```javascript
-const QUESTIONS = [
+&gt;&gt;&gt;
+</code></pre>
+        <h3 id="step-2-script">STEP 2: Script</h3>
+        <p>完整的 script, 參考 [附錄一].</p>
+        <h3 id="step-3--在-google-apps-script-執行環境-建立表單相關物件及事件">STEP 3: 在 Google Apps Script 執行環境, 建立表單相關物件及事件</h3>
+        <ol>
+            <li>開啟 Google Apps Script 網頁: <a href="https://script.google.com/home" target="_blank">Google Apps Script</a>.</li>
+            <li>建立新專案. 名稱: &quot;三年A班-電子病歷測驗&quot;.</li>
+            <li>將產生的 javascript, 貼到 Script Editor.</li>
+            <li>將專案 [儲存] 至雲端硬碟, 再按 [執行].</li>
+        </ol>
+        <p><img src="pictures/01-%E5%84%B2%E5%AD%98%E5%8F%8A%E5%9F%B7%E8%A1%8C%20Google%20Apps%20Script.png" alt="01-儲存及執行 Google Apps Script" /></p>
+        <ol>
+            <li>第一次執行會要求授權, 按畫面指示完成. 如遇「未經 Google 驗證」警告, 點「進階」→「前往…」即可.</li>
+        </ol>
+        <p><img src="pictures/02-%E8%A6%81%E6%B1%82%E6%8E%88%E6%AC%8A.png" alt="02 要求授權" /></p>
+        <p><img src="pictures/03-%E8%A6%81%E6%B1%82%E6%8E%88%E6%AC%8A.png" alt="03 要求授權" /></p>
+        <p><img src="pictures/04-%E8%A6%81%E6%B1%82%E6%8E%88%E6%AC%8A.png" alt="04 要求授權" /></p>
+        <ol>
+            <li>
+                <p>建立表單過程, 發現有錯誤.<br />
+                    --&gt; 說真的, 不太可能一次就建立成功.<br />
+                    <img src="pictures/05-%E5%BB%BA%E7%AB%8B%E9%81%8E%E7%A8%8B%E7%99%BC%E7%94%9F%E9%8C%AF%E8%AA%A4.png" alt="05 建立過程發生錯誤" /></p>
+            </li>
+            <li>
+                <p>將錯誤貼到 ChatGPT, 請它修正.<br />
+                    --&gt; 應該會有多次.</p>
+            </li>
+        </ol>
+        <h3 id="step-4-第一版可以建立表單相關物件及事件的-script">STEP 4: 第一版可以建立表單相關物件及事件的 script</h3>
+        <p>完整的 script, 參考 [附錄二].</p>
+        <h2 id="三-開始測試-如果有錯-要回頭調整-script">三. 開始測試. 如果有錯, 要回頭調整 Script</h2>
+        <h3 id="step-1-填寫考題-並-提交">STEP 1: 填寫考題, 並 [提交]</h3>
+        <p><img src="pictures/21-%E5%A1%AB%E5%AF%AB%E8%80%83%E9%A1%8C.png" alt="21 填寫考題" /></p>
+        <p><img src="pictures/22-%E6%8F%90%E4%BA%A4%E8%80%83%E5%8D%B7.png" alt="22 提交考卷" /></p>
+        <h3 id="step-2-沒有將成績寫入試算表-也未寄送成績單">STEP 2: 沒有將成績寫入試算表, 也未寄送成績單</h3>
+        <p>請 ChatGPT 再修正程式.<br />
+            因為過程有點多, 這個部分就不贅述.</p>
+        <h3 id="step-3-終於產出可滿足需求的版本-script">STEP 3: 終於產出可滿足需求的版本 script</h3>
+        <p>完整的 script, 參考 [附錄三].</p>
+        <h3 id="step-4-測試截圖-考生">STEP 4: 測試截圖 (考生)</h3>
+        <ol>
+            <li>填寫測驗卷, 按 [提交].</li>
+        </ol>
+        <p><img src="pictures/21-%E5%A1%AB%E5%AF%AB%E8%80%83%E9%A1%8C.png" alt="21 填寫考題" /></p>
+        <p><img src="pictures/22-%E6%8F%90%E4%BA%A4%E8%80%83%E5%8D%B7.png" alt="22 提交考卷" /></p>
+        <ol>
+            <li>在 email 會收到成績通知.</li>
+        </ol>
+        <p><img src="pictures/23-%E6%94%B6%E5%88%B0%E6%88%90%E7%B8%BE%E5%96%AE.png" alt="23 收到成績單" /></p>
+        <h3 id="step-5-測試截圖-老師">STEP 5: 測試截圖 (老師)</h3>
+        <ol>
+            <li>查看各考生的成續</li>
+        </ol>
+        <p><img src="pictures/31-%E8%80%81%E5%B8%AB%E6%9F%A5%E7%9C%8B%E6%88%90%E7%B8%BE.png" alt="31 老師查看成績" /></p>
+        <h2 id="四-相關的程式-表單-檔案的存放位置">四. 相關的程式, 表單, 檔案的存放位置</h2>
+        <p>相關的程式, 表單, 檔案 預設都存在 &quot;老師&quot; (測試卷製作者) Google 雲端硬碟的根目錄.</p>
+        <p><img src="pictures/41-%E7%9B%B8%E9%97%9C%E7%A8%8B%E5%BC%8F_%E8%A1%A8%E5%96%AE_%E6%AA%94%E6%A1%88_%E5%AD%98%E6%94%BE%E4%BD%8D%E7%BD%AE.png" alt="41 相關程式_表單_檔案_存放位置" /></p>
+        <h2 id="五-結論">五. 結論</h2>
+        <h3 id="建立-script-範本的好處">建立 script 範本的好處</h3>
+        <p>經由反覆與 ChatGPT 對話, 終於產出一版可用的測驗卷 script 範本.</p>
+        <p>這樣作有什麼好處呢? 未來只要有新的測驗卷要作:</p>
+        <ol>
+            <li>準備 考題及答案.</li>
+            <li>準備 QUESTIONS 的樣版.</li>
+        </ol>
+        <pre><code class="language-javascript">const QUESTIONS = [
   {
     text: '1. 醫療機構電子病歷製作及管理辦法是依據下列哪一條法規訂定？',
     options: [
@@ -264,58 +235,65 @@ const QUESTIONS = [
     answer: 'C'
   }
 ];
-```
-1. 請 ChatGPT 依樣畫葫蘆, 產生 QUESTIONS 的程式段.  
-
-1. 自行合併為新的 script, 修改必要的常數,   
-```javascript
-const FORM_TITLE  = '三年A班-電子病歷測驗卷';
+</code></pre>
+        <ol>
+            <li>
+                <p>請 ChatGPT 依樣畫葫蘆, 產生 QUESTIONS 的程式段.</p>
+            </li>
+            <li>
+                <p>自行合併為新的 script, 修改必要的常數,</p>
+            </li>
+        </ol>
+        <pre><code class="language-javascript">const FORM_TITLE  = '三年A班-電子病歷測驗卷';
 const SHEET_NAME  = '三年A班-電子病歷測驗成績';
 const SENDER_NAME = '電子病歷成績自動回覆系統';
 const PROP_KEY    = 'SCORE_SHEET_ID';   // 存試算表 ID 用
-```
-
-1. 在 Googole Apps Script 建立新的專案, 貼上新的 script, [儲存] + [執行] 就有一份新的測驗卷了.
-
-### 補充說明
-
-目前各家的 AI 模型, 雖然已經算很不錯了, 但還是會犯錯, 需要人工介入; 所以, 通常不大可能一次就完成需求, 要多次對話. 當發生錯誤時, 有 2 種方式處理:  
-1. 人工自行修改程式.
-2. 依使用者回報的狀況及錯誤訊息, 請 AI 自行修改.  
-
-筆者會選擇 o3 推理模型, 主要是對 Google Apps Script 及 Google 表單都不熟, 只能提出 "要作什麼 (What)" 的需求, 無法告知 "如何作 (How)" 的細節.  
-
-所以, 並不是什麼需求都要用推理模型來作, 例如: 旅行中的翻譯需求, 只需基本模型 (ex: 4o) 即可. 筆者有建立了一個 ChatGPTs ( <a href="https://chatgpt.com/g/g-67f75362d0f481919d2368245c517eec-fan-yi-zhong-ying-ri-ji-shi-fan-yi-zhu-li" target="_blank">[翻譯] 中・英・日即時翻譯助理</a> ), 歡迎使用.  
-- 語音的部分是轉到 google 翻譯作處理 (會有 200 個字的限制)
-  - 電腦版會出現 404 error.
-    - ChatGPT 表示, 若是來自電腦版的 Chrome, Google 翻譯會檢查 referer 的 request header, 而 ChatGPT 應該不在名單內, 故被回應 404. 
-    - 只要在網址列, 再按一次 [Enter], 就可以發音了.    
-  - 手機版看來正常.
-    - ChatGPT 表示, 若是來自手機版的 Chrome, 因為一般都沒有傳 referer, 故 Google 翻譯未檢查 referer 的 request header.
-
-![51 中英日翻譯助理](pictures/51-中英日翻譯助理.png)  
-
-
-## [附錄一] 無法在 Google Apps Script 執行建立表單的程式版本
-
-這版會無法在 Google Apps Script 執行, 會發生錯誤.  
-
-### ChatGPT 的回應文字, 已包含如何操作.  
-
-以下範例是一份 **完整可執行的 Google Apps Script**（GAS）；只要把整段貼進 Script Editor（或 App Script IDE），先執行一次 `setup()` 就會：
-
-1. **自動建立測驗表單**（已啟用「電子郵件收集」與「姓名」必填欄位）。
-2. 依題目數自動計算「每題配分 = 100 ÷ 題數」，並將正確解答設定為評分依據。
-3. 建立一張新的 Google 試算表 **「三年A班-電子病歷測驗成績」**，並在表頭排好欄位。
-4. 設定 **安裝式 onFormSubmit 觸發器**，讓程式在考生交卷時自動批改、寫分數、標示錯題並寄成績信。
-
-> **⚠️ 第一次要先在 IDE 執行 `setup()`，授權後就不用再動手。**
-> 之後所有動作（批改、寄信、寫入分數）都將自動發生。
-
-### Script
-
-```javascript
-/************* 使用者可自行調整的區塊 ****************/
+</code></pre>
+        <ol>
+            <li>在 Googole Apps Script 建立新的專案, 貼上新的 script, [儲存] + [執行] 就有一份新的測驗卷了.</li>
+        </ol>
+        <h3 id="補充說明">補充說明</h3>
+        <p>目前各家的 AI 模型, 雖然已經算很不錯了, 但還是會犯錯, 需要人工介入; 所以, 通常不大可能一次就完成需求, 要多次對話. 當發生錯誤時, 有 2 種方式處理:</p>
+        <ol>
+            <li>人工自行修改程式.</li>
+            <li>依使用者回報的狀況及錯誤訊息, 請 AI 自行修改.</li>
+        </ol>
+        <p>筆者會選擇 o3 推理模型, 主要是對 Google Apps Script 及 Google 表單都不熟, 只能提出 &quot;要作什麼 (What)&quot; 的需求, 無法告知 &quot;如何作 (How)&quot; 的細節.</p>
+        <p>所以, 並不是什麼需求都要用推理模型來作, 例如: 旅行中的翻譯需求, 只需基本模型 (ex: 4o) 即可. 筆者有建立了一個 ChatGPTs ( <a href="https://chatgpt.com/g/g-67f75362d0f481919d2368245c517eec-fan-yi-zhong-ying-ri-ji-shi-fan-yi-zhu-li" target="_blank">[翻譯] 中・英・日即時翻譯助理</a> ), 歡迎使用.</p>
+        <ul>
+            <li>語音的部分是轉到 google 翻譯作處理 (會有 200 個字的限制)
+                <ul>
+                    <li>電腦版會出現 404 error.
+                        <ul>
+                            <li>ChatGPT 表示, 若是來自電腦版的 Chrome, Google 翻譯會檢查 referer 的 request header, 而 ChatGPT 應該不在名單內, 故被回應 404.</li>
+                            <li>只要在網址列, 再按一次 [Enter], 就可以發音了.</li>
+                        </ul>
+                    </li>
+                    <li>手機版看來正常.
+                        <ul>
+                            <li>ChatGPT 表示, 若是來自手機版的 Chrome, 因為一般都沒有傳 referer, 故 Google 翻譯未檢查 referer 的 request header.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <p><img src="pictures/51-%E4%B8%AD%E8%8B%B1%E6%97%A5%E7%BF%BB%E8%AD%AF%E5%8A%A9%E7%90%86.png" alt="51 中英日翻譯助理" /></p>
+        <h2 id="附錄一-無法在-google-apps-script-執行建立表單的程式版本">[附錄一] 無法在 Google Apps Script 執行建立表單的程式版本</h2>
+        <p>這版會無法在 Google Apps Script 執行, 會發生錯誤.</p>
+        <h3 id="chatgpt-的回應文字-已包含如何操作">ChatGPT 的回應文字, 已包含如何操作.</h3>
+        <p>以下範例是一份 <strong>完整可執行的 Google Apps Script</strong>（GAS）；只要把整段貼進 Script Editor（或 App Script IDE），先執行一次 <code>setup()</code> 就會：</p>
+        <ol>
+            <li><strong>自動建立測驗表單</strong>（已啟用「電子郵件收集」與「姓名」必填欄位）。</li>
+            <li>依題目數自動計算「每題配分 = 100 ÷ 題數」，並將正確解答設定為評分依據。</li>
+            <li>建立一張新的 Google 試算表 <strong>「三年A班-電子病歷測驗成績」</strong>，並在表頭排好欄位。</li>
+            <li>設定 <strong>安裝式 onFormSubmit 觸發器</strong>，讓程式在考生交卷時自動批改、寫分數、標示錯題並寄成績信。</li>
+        </ol>
+        <blockquote>
+            <p><strong>⚠️ 第一次要先在 IDE 執行 <code>setup()</code>，授權後就不用再動手。</strong>
+                之後所有動作（批改、寄信、寫入分數）都將自動發生。</p>
+        </blockquote>
+        <h3 id="script">Script</h3>
+        <pre><code class="language-javascript">/************* 使用者可自行調整的區塊 ****************/
 
 // 1. 考題（依實際題數增刪）──請保持題目與選項格式一致
 const QUESTIONS = [
@@ -451,12 +429,12 @@ function setup() {
   const pointsPerQuestion = Math.floor(100 / QUESTIONS.length);
   
   // 建題目、設定正確答案與配分
-  QUESTIONS.forEach(q => {
+  QUESTIONS.forEach(q =&gt; {
     const item = form.addMultipleChoiceItem()
                     .setTitle(q.text)
                     .setRequired(true)
                     .setPoints(pointsPerQuestion);
-    const choices = q.options.map(opt => {
+    const choices = q.options.map(opt =&gt; {
       const isCorrect = opt.startsWith(q.answer + '.');
       return item.createChoice(opt, isCorrect); // 第二參數 true = 正解
     });
@@ -466,12 +444,12 @@ function setup() {
   // 2. 建立成績試算表並寫表頭
   const ss = SpreadsheetApp.create(SCORE_SHEET_NAME);
   const header = ['時間戳記', '姓名', 'email', '成績'];
-  for (let i = 1; i <= QUESTIONS.length; i++) header.push(`Q${i}`);
+  for (let i = 1; i &lt;= QUESTIONS.length; i++) header.push(`Q${i}`);
   ss.getActiveSheet().appendRow(header);
   
   // 3. 安裝觸發器（避免重複安裝）
   const triggers = ScriptApp.getProjectTriggers()
-                    .filter(t => t.getHandlerFunction() === 'onFormSubmit');
+                    .filter(t =&gt; t.getHandlerFunction() === 'onFormSubmit');
   if (!triggers.length) {
     ScriptApp.newTrigger('onFormSubmit')
              .forForm(form)
@@ -495,13 +473,13 @@ function onFormSubmit(e) {
   
   // 2. 擷取作答（e.values = [Timestamp, Email, Name, Ans1, Ans2, ...]）
   const submittedAnswers = e.values.slice(3); // 長度 = 題數
-  const answerLetters    = submittedAnswers.map(a => (a || '').trim().charAt(0).toUpperCase());
+  const answerLetters    = submittedAnswers.map(a =&gt; (a || '').trim().charAt(0).toUpperCase());
   
-  // 3. 批改 & 計分
+  // 3. 批改 &amp; 計分
   const pointsPerQuestion = Math.floor(100 / QUESTIONS.length);
   let score = 0;
   const wrongIndices = [];
-  answerLetters.forEach((letter, idx) => {
+  answerLetters.forEach((letter, idx) =&gt; {
     if (letter === QUESTIONS[idx].answer) {
       score += pointsPerQuestion;
     } else {
@@ -517,8 +495,8 @@ function onFormSubmit(e) {
   
   // 5. 標示錯題為黃底
   if (wrongIndices.length) {
-    const bgRange = wrongIndices.map(i => sheet.getRange(rowIndex, 4 + 1 + i)); // 4欄固定 + 第i題
-    bgRange.forEach(r => r.setBackground('#FFF59D')); // 淡黃色
+    const bgRange = wrongIndices.map(i =&gt; sheet.getRange(rowIndex, 4 + 1 + i)); // 4欄固定 + 第i題
+    bgRange.forEach(r =&gt; r.setBackground('#FFF59D')); // 淡黃色
   }
   
   // 6. 寄送成績 Email
@@ -551,14 +529,10 @@ function setScoreSheetId(id) {
     setScoreSheetId(ssId);
   };
 })();
-```
-
-## [附錄二] 可在 Google Apps Script 執行建立表單的程式版本, 但未寫寫試算表及回覆成績
-
-可在 Google Apps Script 執行建立表單的程式版本, 但未寫試算表及回覆成績.  
-
-```javascript
-
+</code></pre>
+        <h2 id="附錄二-可在-google-apps-script-執行建立表單的程式版本-但未寫寫試算表及回覆成績">[附錄二] 可在 Google Apps Script 執行建立表單的程式版本, 但未寫寫試算表及回覆成績</h2>
+        <p>可在 Google Apps Script 執行建立表單的程式版本, 但未寫試算表及回覆成績.</p>
+        <pre><code class="language-javascript">
 /************* 使用者可自行調整的區塊 ****************/
 
 // 1. 題庫（可增減題目、修改答案）
@@ -696,12 +670,12 @@ function setup() {
   const pointsPerQuestion = Math.floor(100 / QUESTIONS.length);
 
   // 新增所有題目
-  QUESTIONS.forEach(q => {
+  QUESTIONS.forEach(q =&gt; {
     const item = form.addMultipleChoiceItem()
                      .setTitle(q.text)
                      .setRequired(true)
                      .setPoints(pointsPerQuestion);
-    const choices = q.options.map(opt => {
+    const choices = q.options.map(opt =&gt; {
       const isCorrect = opt.startsWith(q.answer + '.');
       return item.createChoice(opt, isCorrect);
     });
@@ -711,7 +685,7 @@ function setup() {
   /* ---------- 建立成績試算表 ---------- */
   const ss = SpreadsheetApp.create(SCORE_SHEET_NAME);
   const header = ['時間戳記', '姓名', 'email', '成績'];
-  for (let i = 1; i <= QUESTIONS.length; i++) header.push(`Q${i}`);
+  for (let i = 1; i &lt;= QUESTIONS.length; i++) header.push(`Q${i}`);
   ss.getActiveSheet().appendRow(header);
 
   // 將試算表 ID 存入屬性，後續查閱
@@ -719,7 +693,7 @@ function setup() {
 
   /* ---------- 安裝觸發器（若尚未安裝） ---------- */
   if (!ScriptApp.getProjectTriggers()
-        .some(t => t.getHandlerFunction() === 'onFormSubmit')) {
+        .some(t =&gt; t.getHandlerFunction() === 'onFormSubmit')) {
     ScriptApp.newTrigger('onFormSubmit')
              .forForm(form)
              .onFormSubmit()
@@ -743,13 +717,13 @@ function onFormSubmit(e) {
 
   // 擷取作答（索引 3 起）
   const submittedAnswers = e.values.slice(3);
-  const answerLetters = submittedAnswers.map(a => (a || '').trim().charAt(0).toUpperCase());
+  const answerLetters = submittedAnswers.map(a =&gt; (a || '').trim().charAt(0).toUpperCase());
 
   // 批改
   const pointsPerQuestion = Math.floor(100 / QUESTIONS.length);
   let score = 0;
   const wrongIdx = [];
-  answerLetters.forEach((letter, idx) => {
+  answerLetters.forEach((letter, idx) =&gt; {
     if (letter === QUESTIONS[idx].answer) score += pointsPerQuestion;
     else wrongIdx.push(idx);
   });
@@ -761,7 +735,7 @@ function onFormSubmit(e) {
   const rowIndex = sheet.appendRow(row).getRow();
 
   // 錯題標黃
-  wrongIdx.forEach(i => {
+  wrongIdx.forEach(i =&gt; {
     sheet.getRange(rowIndex, 4 + 1 + i) // 第 4 欄後是 Q1...
          .setBackground('#FFF59D');
   });
@@ -785,14 +759,10 @@ function getScoreSheetId() {
   return id;
 }
 
-```
-
-## [附錄三] 可在 Google Apps Script 執行建立表, 並寫試算表及回覆成績的版本
-
-可在 Google Apps Script 執行建立表, 並寫試算表及回覆成績的版本.  
-
-```javascript
-/***********  可依需求自行調整的常數  ****************/
+</code></pre>
+        <h2 id="附錄三-可在-google-apps-script-執行建立表-並寫試算表及回覆成績的版本">[附錄三] 可在 Google Apps Script 執行建立表, 並寫試算表及回覆成績的版本</h2>
+        <p>可在 Google Apps Script 執行建立表, 並寫試算表及回覆成績的版本.</p>
+        <pre><code class="language-javascript">/***********  可依需求自行調整的常數  ****************/
 const FORM_TITLE  = '三年A班-電子病歷測驗卷';
 const SHEET_NAME  = '三年A班-電子病歷測驗成績';
 const SENDER_NAME = '電子病歷成績自動回覆系統';
@@ -919,12 +889,12 @@ function setup() {
   const pts = Math.floor(100 / QUESTIONS.length);
 
   // 建題目並設定解答
-  QUESTIONS.forEach(q => {
+  QUESTIONS.forEach(q =&gt; {
     const item = form.addMultipleChoiceItem()
                      .setTitle(q.text)
                      .setRequired(true)
                      .setPoints(pts);
-    const choices = q.options.map(opt => {
+    const choices = q.options.map(opt =&gt; {
       const correct = opt.startsWith(q.answer + '.');
       return item.createChoice(opt, correct);
     });
@@ -934,7 +904,7 @@ function setup() {
   /* ------ 建立試算表 ------ */
   const ss = SpreadsheetApp.create(SHEET_NAME);
   const head = ['時間戳記', '姓名', 'email', '成績'];
-  for (let i = 1; i <= QUESTIONS.length; i++) head.push(`Q${i}`);
+  for (let i = 1; i &lt;= QUESTIONS.length; i++) head.push(`Q${i}`);
   ss.getSheets()[0].setName('成績').appendRow(head);
 
   // 存試算表 ID 供 onFormSubmit 使用
@@ -963,7 +933,7 @@ function onFormSubmit(e) {
     const answers = items.slice(1);                      // 其餘為考題
 
     // 將作答取首字母（A/B/C/D…）
-    const letters = answers.map(r => {
+    const letters = answers.map(r =&gt; {
       const a = (r.getResponse() || '').trim();
       return a.charAt(0).toUpperCase();
     });
@@ -972,7 +942,7 @@ function onFormSubmit(e) {
     const pts = Math.floor(100 / QUESTIONS.length);
     let score = 0;
     const wrong = [];
-    letters.forEach((l, i) => {
+    letters.forEach((l, i) =&gt; {
       if (l === QUESTIONS[i].answer) score += pts;
       else wrong.push(i);
     });
@@ -987,7 +957,7 @@ function onFormSubmit(e) {
     const rowIdx = sheet.getLastRow();
 
     // 標錯題黃底
-    wrong.forEach(i => sheet.getRange(rowIdx, 5 + i).setBackground('#FFF59D'));
+    wrong.forEach(i =&gt; sheet.getRange(rowIdx, 5 + i).setBackground('#FFF59D'));
 
     /* ------ 寄送成績信 ------ */
     GmailApp.sendEmail(
@@ -1001,9 +971,6 @@ function onFormSubmit(e) {
     throw err; // 讓錯誤顯示在執行記錄中，方便除錯
   }
 }
-```
-
-
- 
-
-
+</code></pre>
+    </div>
+</body>
