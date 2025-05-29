@@ -265,9 +265,9 @@ const QUESTIONS = [
   }
 ];
 ```
-1. 請 ChatGPT 依樣畫葫蘆, 產生 QUESTIONS 的程式段.  
+3. 請 ChatGPT 依樣畫葫蘆, 產生 QUESTIONS 的程式段.  
 
-1. 自行合併為新的 script, 修改必要的常數,   
+4. 自行合併為新的 script, 修改必要的常數,   
 ```javascript
 const FORM_TITLE  = '三年A班-電子病歷測驗卷';
 const SHEET_NAME  = '三年A班-電子病歷測驗成績';
@@ -275,7 +275,7 @@ const SENDER_NAME = '電子病歷成績自動回覆系統';
 const PROP_KEY    = 'SCORE_SHEET_ID';   // 存試算表 ID 用
 ```
 
-1. 在 Googole Apps Script 建立新的專案, 貼上新的 script, [儲存] + [執行] 就有一份新的測驗卷了.
+5. 在 Googole Apps Script 建立新的專案, 貼上新的 script, [儲存] + [執行] 就有一份新的測驗卷了.
 
 ### 補充說明
 
